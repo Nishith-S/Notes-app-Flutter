@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:notes/models/note.dart';
 import 'package:notes/models/note_db.dart';
 import 'package:notes/pages/text_editing_page.dart';
@@ -23,13 +26,20 @@ class _HomePageState extends State<HomePage> {
   NoteDataBase noteDataBase = NoteDataBase();
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
+  Timer? timer;
 
   @override
   void initState() {
     super.initState();
     readNotes();
+    timer = Timer.periodic(const Duration(seconds: 60), (Timer t) => setState(() {}));
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    timer?.cancel();
+  }
   //boolean to have a message when there is no note
   bool haveNote() {
     final foundNotee =
@@ -38,6 +48,23 @@ class _HomePageState extends State<HomePage> {
       return true;
     }
     return false;
+  }
+
+  String formatTimeStamp(DateTime? timestamp) {
+    if (timestamp == null) return '';
+
+    final now = DateTime.now();
+    final diff = now.difference(timestamp);
+    if (diff.inMinutes < 1) {
+      return 'Just now';
+    }
+    if (diff.inMinutes <= 59) {
+      return '${diff.inMinutes} minute(s) ago';
+    }
+    if (diff.inMinutes >= 60) {
+      return DateFormat('dd/MM/yyyy').format(timestamp);
+    }
+    return '';
   }
 
   createANote() {
@@ -214,14 +241,21 @@ class _HomePageState extends State<HomePage> {
         color: Theme.of(context).colorScheme.background,
         onRefresh: _handleRefresh,
         child: Column(
-          // mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
               alignment: Alignment.centerLeft,
               padding: const EdgeInsets.only(left: 20, bottom: 10),
               child: Text(
                 "Notes",
-                style: GoogleFonts.dmSerifText(fontSize: 38),
+                style: GoogleFonts.noticiaText(fontSize: 38),
+              ),
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.only(left: 20, bottom: 10),
+              child: Text(
+                '${currentNote.length.toString()} notes',
+                style: Theme.of(context).textTheme.titleSmall,
               ),
             ),
             if (haveNote())
@@ -243,7 +277,7 @@ class _HomePageState extends State<HomePage> {
                                         height: 200,
                                         width: 250,
                                         child: CupertinoActionSheet(
-                                          title: const Text("Notes"),
+                                          title: const Text("Notes App"),
                                           actions: [
                                             TextButton(
                                               onPressed: () {
@@ -257,7 +291,19 @@ class _HomePageState extends State<HomePage> {
                                                 style: TextStyle(
                                                     color: Colors.red),
                                               ),
-                                            )
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: Text(
+                                                "Cancel",
+                                                style: TextStyle(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .inversePrimary),
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       );
@@ -265,7 +311,7 @@ class _HomePageState extends State<HomePage> {
                               },
                               child: Padding(
                                 padding: const EdgeInsets.only(
-                                    top: 25, bottom: 0, left: 18, right: 18),
+                                    top: 15, bottom: 0, left: 10, right: 10),
                                 child: Container(
                                     padding: const EdgeInsets.all(20),
                                     decoration: BoxDecoration(
@@ -273,7 +319,7 @@ class _HomePageState extends State<HomePage> {
                                             .colorScheme
                                             .primary,
                                         borderRadius:
-                                            BorderRadius.circular(25)),
+                                            BorderRadius.circular(15)),
                                     child: CupertinoListTile(
                                       onTap: () {
                                         updateNote(note, note.id);
@@ -288,11 +334,16 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       subtitle: Text(
                                         note.textNote.toString(),
+                                        overflow: TextOverflow.values[2],
                                         style: TextStyle(
                                             fontSize: 15.7,
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .inversePrimary),
+                                      ),
+                                      additionalInfo: Text(
+                                        formatTimeStamp(note.timeStamp),
+                                        overflow: TextOverflow.values[2],
                                       ),
                                     )),
                               ),
@@ -308,9 +359,9 @@ class _HomePageState extends State<HomePage> {
                                 crossAxisCount: 2),
                         itemBuilder: (BuildContext context, int index) {
                           Provider.of<NoteDataBase>(context, listen: false)
-                                  .foundNote
-                                  .reversed
-                                  .toList();
+                              .foundNote
+                              .reversed
+                              .toList();
                           final note = currentNote[index];
                           return GestureDetector(
                             onTap: () => updateNote(note, note.id),
@@ -322,7 +373,7 @@ class _HomePageState extends State<HomePage> {
                                       height: 200,
                                       width: 300,
                                       child: CupertinoActionSheet(
-                                        title: const Text("Notes"),
+                                        title: const Text("Notes App"),
                                         actions: [
                                           TextButton(
                                             onPressed: () {
@@ -336,40 +387,59 @@ class _HomePageState extends State<HomePage> {
                                               style:
                                                   TextStyle(color: Colors.red),
                                             ),
-                                          )
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text(
+                                              "Cancel",
+                                              style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .inversePrimary),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     );
                                   });
                             },
                             child: Padding(
-                              padding: const EdgeInsets.all(5.5),
+                              padding: const EdgeInsets.all(7.5),
                               child: Container(
-                                padding:
-                                    const EdgeInsets.only(left: 10, right: 10),
                                 decoration: BoxDecoration(
                                   color: Theme.of(context).colorScheme.primary,
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: BorderRadius.circular(15),
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 5, vertical: 25),
+                                      horizontal: 10, vertical: 20),
                                   child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: [
                                       Text(
                                         note.titleNote.toString(),
                                         overflow: TextOverflow.values[2],
                                         style: const TextStyle(fontSize: 20.0),
                                       ),
-                                      const SizedBox(
-                                        height: 8.0,
-                                      ),
                                       Text(
                                         note.textNote.toString(),
                                         overflow: TextOverflow.values[2],
-                                        style: const TextStyle(
-                                          fontSize: 15.7,
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
+                                      SizedBox(
+                                        height: MediaQuery.of(context).size.height * 0.010,
+                                      ),
+                                      Text(
+                                        formatTimeStamp(note.timeStamp),
+                                        overflow: TextOverflow.values[2],
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleSmall,
                                       ),
                                     ],
                                   ),
@@ -381,10 +451,10 @@ class _HomePageState extends State<HomePage> {
                       ),
               )
             else
-              const Align(
-                alignment: Alignment.center,
-                child: Text(
-                  "No notes",
+              const Text(
+                "No notes",
+                style: TextStyle(
+                  fontSize: 20
                 ),
               ),
           ],

@@ -25,7 +25,8 @@ class NoteDataBase extends ChangeNotifier {
     //new Note object and stored in newNote
     final newNote = Note()
       ..titleNote = title
-      ..textNote = text;
+      ..textNote = text
+      ..timeStamp = DateTime.now();
     //write transaction
     await isar.writeTxn(() => isar.notes.put(newNote));
     // re-read from db by calling readNote method given below
@@ -44,6 +45,7 @@ class NoteDataBase extends ChangeNotifier {
   Future<void> updateNote(int? id, String newTitle, String? newText) async {
     final availableNotes = await isar.notes.get(id!);
     if (availableNotes != null) {
+
       availableNotes.titleNote = newTitle;
       availableNotes.textNote = newText;
       await isar.writeTxn(() => isar.notes.put(availableNotes));
@@ -73,10 +75,5 @@ class NoteDataBase extends ChangeNotifier {
     foundNote = result;
     currentNote = foundNote;
     notifyListeners();
-  }
-
-  //save user settings
-  Future<void> saveTheme(bool isDarkMode) async {
-    // final gotTheme = isar.
   }
 }

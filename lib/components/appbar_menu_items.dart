@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AppBarMenu extends StatelessWidget {
-  Widget? child;
-  void Function()? onTap;
-  AppBarMenu({
+ final Widget? child;
+ final void Function()? onTap;
+  const AppBarMenu({
     super.key,
     required this.child,
     required this.onTap

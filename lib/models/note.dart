@@ -9,15 +9,12 @@ class Note {
   Id? id = Isar.autoIncrement; //start from 0 and 1,2,3... and so on
   late String? titleNote;
   late String? textNote; //will initialize later
+  late DateTime? timeStamp;
 
   Note({
     this.id,
     this.titleNote,
     this.textNote,
+    this.timeStamp,
   });
 }
-
-// class UserSettings {
-//   bool isListView = true;
-//   bool isDarkMode = true;
-// }

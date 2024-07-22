@@ -22,8 +22,13 @@ const NoteSchema = CollectionSchema(
       name: r'textNote',
       type: IsarType.string,
     ),
-    r'titleNote': PropertySchema(
+    r'timeStamp': PropertySchema(
       id: 1,
+      name: r'timeStamp',
+      type: IsarType.dateTime,
+    ),
+    r'titleNote': PropertySchema(
+      id: 2,
       name: r'titleNote',
       type: IsarType.string,
     )
@@ -70,7 +75,8 @@ void _noteSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.textNote);
-  writer.writeString(offsets[1], object.titleNote);
+  writer.writeDateTime(offsets[1], object.timeStamp);
+  writer.writeString(offsets[2], object.titleNote);
 }
 
 Note _noteDeserialize(
@@ -82,7 +88,8 @@ Note _noteDeserialize(
   final object = Note(
     id: id,
     textNote: reader.readStringOrNull(offsets[0]),
-    titleNote: reader.readStringOrNull(offsets[1]),
+    timeStamp: reader.readDateTimeOrNull(offsets[1]),
+    titleNote: reader.readStringOrNull(offsets[2]),
   );
   return object;
 }
@@ -97,6 +104,8 @@ P _noteDeserializeProp<P>(
     case 0:
       return (reader.readStringOrNull(offset)) as P;
     case 1:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 2:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -404,6 +413,75 @@ extension NoteQueryFilter on QueryBuilder<Note, Note, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Note, Note, QAfterFilterCondition> timeStampIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'timeStamp',
+      ));
+    });
+  }
+
+  QueryBuilder<Note, Note, QAfterFilterCondition> timeStampIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'timeStamp',
+      ));
+    });
+  }
+
+  QueryBuilder<Note, Note, QAfterFilterCondition> timeStampEqualTo(
+      DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'timeStamp',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Note, Note, QAfterFilterCondition> timeStampGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'timeStamp',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Note, Note, QAfterFilterCondition> timeStampLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'timeStamp',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Note, Note, QAfterFilterCondition> timeStampBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'timeStamp',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Note, Note, QAfterFilterCondition> titleNoteIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -568,6 +646,18 @@ extension NoteQuerySortBy on QueryBuilder<Note, Note, QSortBy> {
     });
   }
 
+  QueryBuilder<Note, Note, QAfterSortBy> sortByTimeStamp() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'timeStamp', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Note, Note, QAfterSortBy> sortByTimeStampDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'timeStamp', Sort.desc);
+    });
+  }
+
   QueryBuilder<Note, Note, QAfterSortBy> sortByTitleNote() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'titleNote', Sort.asc);
@@ -606,6 +696,18 @@ extension NoteQuerySortThenBy on QueryBuilder<Note, Note, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Note, Note, QAfterSortBy> thenByTimeStamp() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'timeStamp', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Note, Note, QAfterSortBy> thenByTimeStampDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'timeStamp', Sort.desc);
+    });
+  }
+
   QueryBuilder<Note, Note, QAfterSortBy> thenByTitleNote() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'titleNote', Sort.asc);
@@ -627,6 +729,12 @@ extension NoteQueryWhereDistinct on QueryBuilder<Note, Note, QDistinct> {
     });
   }
 
+  QueryBuilder<Note, Note, QDistinct> distinctByTimeStamp() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'timeStamp');
+    });
+  }
+
   QueryBuilder<Note, Note, QDistinct> distinctByTitleNote(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -645,6 +753,12 @@ extension NoteQueryProperty on QueryBuilder<Note, Note, QQueryProperty> {
   QueryBuilder<Note, String?, QQueryOperations> textNoteProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'textNote');
+    });
+  }
+
+  QueryBuilder<Note, DateTime?, QQueryOperations> timeStampProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'timeStamp');
     });
   }
 

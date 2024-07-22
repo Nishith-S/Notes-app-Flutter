@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class DrawerTile extends StatelessWidget {
-  Widget? title;
-  Widget? leading;
-  void Function()? onTap;
-  DrawerTile({
+ final Widget? title;
+ final Widget? leading;
+ final void Function()? onTap;
+ const DrawerTile({
     super.key,
     required this.title,
     required this.leading,

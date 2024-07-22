@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class MenuItems extends StatelessWidget {
-  void Function()? onDeleteTap;
-  MenuItems({
+  final void Function()? onDeleteTap;
+  const MenuItems({
     super.key,
    required this.onDeleteTap,
   });
@@ -16,10 +16,10 @@ class MenuItems extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: onDeleteTap,
-          child: Container(
+          child: const SizedBox(
             height: 40,
             width: 100,
-            child: const Center(child: Text("Delete")),
+            child: Center(child: Text("Delete")),
           ),
         ),
       ],

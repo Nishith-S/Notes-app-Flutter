@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart';
 import 'package:notes/models/note_db.dart';
 import 'package:provider/provider.dart';
 import '../models/note.dart';
@@ -26,7 +25,6 @@ class TextEditingPage extends StatefulWidget {
 }
 
 class _TextEditingPageState extends State<TextEditingPage> {
-  final QuillController _quillController = QuillController.basic();
   TextEditingController titleController = TextEditingController();
   TextEditingController textController = TextEditingController();
 
@@ -34,16 +32,6 @@ class _TextEditingPageState extends State<TextEditingPage> {
   void initState() {
     super.initState();
     loadExistingNote();
-  }
-
-  bool haveText() {
-    setState(() {});
-    if (titleController.text.isNotEmpty &&
-        _quillController.document.toPlainText().isNotEmpty) {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   addNote() {
@@ -140,7 +128,7 @@ class _TextEditingPageState extends State<TextEditingPage> {
                 children: [
                   Padding(
                     padding:
-                        const EdgeInsets.only(left: 15, right: 15, top: 20),
+                        const EdgeInsets.only(left: 15, right: 15, top: 5),
                     child: TextField(
                       cursorColor: Theme.of(context).colorScheme.inversePrimary,
                       style: const TextStyle(fontSize: 28),
@@ -153,7 +141,7 @@ class _TextEditingPageState extends State<TextEditingPage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 25, right: 15),
+                    padding: const EdgeInsets.only(left: 15, right: 15),
                     child: TextField(
                       maxLines: 50000,
                       autofocus: true,
